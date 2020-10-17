@@ -66,11 +66,7 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
     struct sockaddr_storage s = {0};
     auto *a = reinterpret_cast<sockaddr_in *>(&s);
     a->sin_family = AF_INET;
-#ifdef _WIN32
-    a->sin_addr.S_un.S_addr = addr.v4.ip.ip;
-#else
     a->sin_addr.s_addr = addr.v4.ip.ip;
-#endif
     a->sin_port = addr.v4.port;
     return {s, sizeof(*a)};
 }
