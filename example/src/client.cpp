@@ -9,7 +9,7 @@ using namespace ingsock;
 int main(int, char **) {
     Socket s{Domain::ipv4, Type::stream, Protocol::tcp};
 
-    if (!s.connect(SocketAddrV4{IpAddrV4{127, 0, 0, 1}, 22222})) {
+    if (!s.connect(SocketAddrV4{IpAddrV4::localhost(), 22222})) {
         const int err{last_error()};
         std::cerr << "Failed to connect to server: " << err << std::endl;
         return 1;
