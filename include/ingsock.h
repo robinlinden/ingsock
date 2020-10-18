@@ -1,6 +1,7 @@
 #ifndef INGSOCK_H
 #define INGSOCK_H
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -15,17 +16,31 @@ struct IpAddrV4 {
     std::uint32_t ip;
 };
 
+struct IpAddrV6 {
+    explicit constexpr IpAddrV6(std::array<std::byte, 16> ip_) : ip{ip_} {}
+    std::array<std::byte, 16> ip;
+};
+
 // SocketAddr
 struct SocketAddrV4 {
     IpAddrV4 ip;
     uint16_t port;
 };
 
+struct SocketAddrV6 {
+    IpAddrV6 ip;
+    uint16_t port;
+};
+
 struct SocketAddr {
     constexpr SocketAddr(SocketAddrV4 v) : is_ipv4{true}, v4{v} {}
+    constexpr SocketAddr(SocketAddrV6 v) : is_ipv4{false}, v6{v} {}
 
     bool is_ipv4;
-    SocketAddrV4 v4;
+    union {
+        SocketAddrV4 v4;
+        SocketAddrV6 v6;
+    };
 };
 
 // Socket
