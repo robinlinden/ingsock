@@ -29,14 +29,14 @@ struct IpAddrV6 {
     explicit constexpr IpAddrV6(std::array<std::byte, 16> ip_) : ip{ip_} {}
     std::array<std::byte, 16> ip;
 
-    static constexpr std::array<std::byte, 16> localhost() {
+    static constexpr IpAddrV6 localhost() {
         std::array<std::byte, 16> ip{};
         ip[15] = static_cast<std::byte>(1);
-        return ip;
+        return IpAddrV6{ip};
     }
 
-    static constexpr std::array<std::byte, 16> any() {
-        return std::array<std::byte, 16>{};
+    static constexpr IpAddrV6 any() {
+        return IpAddrV6{std::array<std::byte, 16>{}};
     }
 };
 std::ostream &operator<<(std::ostream &os, IpAddrV6 ip);
