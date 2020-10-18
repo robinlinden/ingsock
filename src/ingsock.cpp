@@ -10,6 +10,8 @@
 #include <ws2tcpip.h>
 #else
 #include <errno.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -144,6 +146,27 @@ int last_error() {
 #else
     return errno;
 #endif
+}
+
+std::vector<IpAddr> resolve(const char *name) {
+    struct hostent *hosts = gethostbyname(name);
+    if (hosts == nullptr) {
+        return {};
+    }
+
+    std::vector<IpAddr> resolved;
+    if (hosts->h_addrtype == AF_INET) {
+        for (size_t i = 0; hosts->h_addr_list[i] != nullptr; ++i) {
+            resolved.emplace_back(IpAddrV4{*reinterpret_cast<uint32_t *>(hosts->h_addr_list[i])});
+        }
+    } else {
+        for (size_t i = 0; hosts->h_addr_list[i] != nullptr; ++i) {
+            auto &ip = resolved.emplace_back(IpAddrV6{});
+            memcpy(std::get<IpAddrV6>(ip).ip.data(), hosts->h_addr_list[i], 16);
+        }
+    }
+
+    return resolved;
 }
 
 } // namespace ingsock

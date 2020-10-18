@@ -6,3 +6,5 @@ endfunction()
 
 make_example(client)
 make_example(server)
+
+make_example(resolve)

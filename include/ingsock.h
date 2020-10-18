@@ -7,6 +7,8 @@
 #include <iosfwd>
 #include <string>
 #include <utility>
+#include <variant>
+#include <vector>
 
 namespace ingsock {
 
@@ -14,6 +16,7 @@ namespace ingsock {
 struct IpAddrV4 {
     constexpr IpAddrV4(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d) :
             ip{static_cast<uint32_t>(a | b << 8 | c << 16 | d << 24)} {}
+    explicit constexpr IpAddrV4(std::uint32_t ip_) : ip{ip_} {}
     std::uint32_t ip;
 
     static constexpr IpAddrV4 localhost() { return IpAddrV4{127, 0, 0, 1}; }
@@ -22,6 +25,7 @@ struct IpAddrV4 {
 std::ostream &operator<<(std::ostream &os, IpAddrV4 ip);
 
 struct IpAddrV6 {
+    constexpr IpAddrV6() : ip{} {}
     explicit constexpr IpAddrV6(std::array<std::byte, 16> ip_) : ip{ip_} {}
     std::array<std::byte, 16> ip;
 
@@ -36,6 +40,8 @@ struct IpAddrV6 {
     }
 };
 std::ostream &operator<<(std::ostream &os, IpAddrV6 ip);
+
+using IpAddr = std::variant<IpAddrV4, IpAddrV6>;
 
 // SocketAddr
 struct SocketAddrV4 {
@@ -96,6 +102,7 @@ private:
 };
 
 int last_error();
+std::vector<IpAddr> resolve(const char *name);
 
 }
 
