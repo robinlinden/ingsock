@@ -7,9 +7,11 @@
 using namespace ingsock;
 
 int main(int, char **) {
-    Socket s{Domain::ipv4, Type::stream, Protocol::tcp};
+    Socket s{Domain::ipv6, Type::stream, Protocol::tcp};
 
-    if (!s.connect(SocketAddrV4{IpAddrV4{127, 0, 0, 1}, 22222})) {
+    std::array<std::byte, 16> ip{};
+    ip[15] = static_cast<std::byte>(1);
+    if (!s.connect(SocketAddrV6{IpAddrV6{ip}, 22222})) {
         const int err{last_error()};
         std::cerr << "Failed to connect to server: " << err << std::endl;
         return 1;
