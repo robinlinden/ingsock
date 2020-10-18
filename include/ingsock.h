@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
 #include <string>
 #include <utility>
 
@@ -18,6 +19,7 @@ struct IpAddrV4 {
     static constexpr IpAddrV4 localhost() { return IpAddrV4{127, 0, 0, 1}; }
     static constexpr IpAddrV4 any() { return IpAddrV4{0, 0, 0, 0}; }
 };
+std::ostream &operator<<(std::ostream &os, IpAddrV4 ip);
 
 struct IpAddrV6 {
     explicit constexpr IpAddrV6(std::array<std::byte, 16> ip_) : ip{ip_} {}
@@ -33,6 +35,7 @@ struct IpAddrV6 {
         return std::array<std::byte, 16>{};
     }
 };
+std::ostream &operator<<(std::ostream &os, IpAddrV6 ip);
 
 // SocketAddr
 struct SocketAddrV4 {

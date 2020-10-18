@@ -82,6 +82,29 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
 
 } // namespace
 
+std::ostream &operator<<(std::ostream &os, IpAddrV4 ip) {
+    std::string str{};
+    str.resize(16);
+    struct in_addr addr = {0};
+    addr.s_addr = ip.ip;
+    if (inet_ntop(AF_INET, &addr, str.data(), str.size()) == nullptr) {
+        throw std::runtime_error("bad ip address in << for ipv4");
+    }
+
+    os << str;
+    return os;
+}
+std::ostream &operator<<(std::ostream &os, IpAddrV6 ip) {
+    std::string str{};
+    str.resize(46);
+    if (inet_ntop(AF_INET, &ip.ip, str.data(), str.size()) == nullptr) {
+        throw std::runtime_error("bad ip address in << for ipv6");
+    }
+
+    os << str;
+    return os;
+}
+
 Socket::Socket(Domain d, Type t, Protocol p) :
         socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
 
