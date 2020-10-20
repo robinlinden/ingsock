@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <ostream>
 #include <stdexcept>
 
 #ifdef _WIN32
@@ -85,25 +86,21 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
 } // namespace
 
 std::ostream &operator<<(std::ostream &os, IpAddrV4 ip) {
-    std::string str{};
-    str.resize(16);
-    struct in_addr addr = {0};
-    addr.s_addr = ip.ip;
-    if (inet_ntop(AF_INET, &addr, str.data(), str.size()) == nullptr) {
+    char buf[INET_ADDRSTRLEN] = {0};
+    if (inet_ntop(AF_INET, &ip.ip, buf, sizeof(buf)) == nullptr) {
         throw std::runtime_error("bad ip address in << for ipv4");
     }
 
-    os << str;
+    os << buf;
     return os;
 }
 std::ostream &operator<<(std::ostream &os, IpAddrV6 ip) {
-    std::string str{};
-    str.resize(46);
-    if (inet_ntop(AF_INET, &ip.ip, str.data(), str.size()) == nullptr) {
+    char buf[INET6_ADDRSTRLEN] = {0};
+    if (inet_ntop(AF_INET6, &ip.ip, buf, sizeof(buf)) == nullptr) {
         throw std::runtime_error("bad ip address in << for ipv6");
     }
 
-    os << str;
+    os << buf;
     return os;
 }
 

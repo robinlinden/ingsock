@@ -1,24 +1,9 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.15)
 
 project(ingsock)
 
-add_library(${PROJECT_NAME}
-    src/ingsock.cpp
-)
+enable_testing()
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-        include
-)
+add_subdirectory(third_party/catch2)
 
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        $<$<PLATFORM_ID:Windows>:ws2_32>
-)
-
-target_compile_features(${PROJECT_NAME}
-    PUBLIC
-        cxx_std_17
-)
-
-add_subdirectory(example)
+add_subdirectory(ingsock)
