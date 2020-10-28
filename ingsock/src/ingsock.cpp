@@ -72,13 +72,13 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
         auto *a = reinterpret_cast<sockaddr_in *>(&s);
         a->sin_family = AF_INET;
         a->sin_addr.s_addr = addr.v4.ip.ip;
-        a->sin_port = addr.v4.port;
+        a->sin_port = htons(addr.v4.port);
         return {s, sizeof(*a)};
     } else {
         auto *a = reinterpret_cast<sockaddr_in6 *>(&s);
         a->sin6_family = AF_INET6;
         std::memcpy(a->sin6_addr.s6_addr, addr.v6.ip.ip.data(), addr.v6.ip.ip.size());
-        a->sin6_port = addr.v6.port;
+        a->sin6_port = htons(addr.v6.port);
         return {s, sizeof(*a)};
     }
 }
