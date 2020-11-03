@@ -22,7 +22,7 @@ int main(int, char **) {
 
     Socket client{s.accept()};
     const std::string msg{"hello client"};
-    if (client.send(reinterpret_cast<const std::byte *>(msg.data()), msg.size()) != msg.size()) {
+    if (client.send(reinterpret_cast<const std::byte *>(msg.data()), msg.size()) != static_cast<int>(msg.size())) {
         const int err = last_error();
         std::cerr << "Failed to send message: " << err << std::endl;
     }

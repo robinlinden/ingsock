@@ -112,7 +112,7 @@ Socket::Socket(int socket) : socket_{socket} {}
 bool Socket::connect(const SocketAddr addr) {
     const auto [a, size] = into_os(addr);
     return ::connect(socket_, reinterpret_cast<const struct sockaddr *>(&a), size) == 0;
-};
+}
 
 bool Socket::bind(const SocketAddr addr) {
     const auto [a, size] = into_os(addr);

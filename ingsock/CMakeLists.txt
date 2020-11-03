@@ -11,6 +11,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+        ingsock::warning
         $<$<PLATFORM_ID:Windows>:ws2_32>
 )
 
