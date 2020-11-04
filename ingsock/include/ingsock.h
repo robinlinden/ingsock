@@ -14,6 +14,8 @@ namespace ingsock {
 
 // IpAddr
 struct IpAddrV4 {
+    static IpAddrV4 parse(const std::string &ip);
+
     constexpr IpAddrV4(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d) :
             ip{static_cast<uint32_t>(a | b << 8 | c << 16 | d << 24)} {}
     explicit constexpr IpAddrV4(std::uint32_t ip_) : ip{ip_} {}
@@ -25,6 +27,8 @@ struct IpAddrV4 {
 std::ostream &operator<<(std::ostream &os, IpAddrV4 ip);
 
 struct IpAddrV6 {
+    static IpAddrV6 parse(const std::string &ip);
+
     constexpr IpAddrV6() : ip{} {}
     explicit constexpr IpAddrV6(std::array<std::byte, 16> ip_) : ip{ip_} {}
     std::array<std::byte, 16> ip;

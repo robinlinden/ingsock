@@ -7,6 +7,12 @@
 
 using namespace ingsock;
 
+TEST_CASE("IpAddrV6::parse") {
+    using namespace std::literals;
+    REQUIRE(IpAddrV6::localhost().ip == IpAddrV6::parse("::1"s).ip);
+    REQUIRE(IpAddrV6::any().ip == IpAddrV6::parse("::"s).ip);
+}
+
 TEST_CASE("IpAddrV6::localhost") {
     std::array<std::byte, 16> localhost{};
     localhost[15] = static_cast<std::byte>(1);

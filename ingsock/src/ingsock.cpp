@@ -104,6 +104,25 @@ std::ostream &operator<<(std::ostream &os, IpAddrV6 ip) {
     return os;
 }
 
+static_assert(sizeof(std::uint32_t) == sizeof(struct in_addr));
+IpAddrV4 IpAddrV4::parse(const std::string &ip_str) {
+    IpAddrV4 ip{0};
+    if (inet_pton(AF_INET, ip_str.c_str(), &ip.ip) == 0) {
+        throw std::runtime_error("bad ipv4 str");
+    }
+
+    return ip;
+}
+static_assert(sizeof(IpAddrV6::ip) == sizeof(struct in6_addr));
+IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
+    IpAddrV6 ip{};
+    if (inet_pton(AF_INET6, ip_str.c_str(), &ip.ip) == 0) {
+        throw std::runtime_error("bad ipv6 str");
+    }
+
+    return ip;
+}
+
 Socket::Socket(Domain d, Type t, Protocol p) :
         socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
 
