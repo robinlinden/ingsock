@@ -12,6 +12,7 @@
 #else
 #include <errno.h>
 #include <netdb.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/types.h>
@@ -83,6 +84,21 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
     }
 }
 
+constexpr int into_os(Shutdown s) {
+    switch (s) {
+#ifdef _WIN32
+        case Shutdown::receive: return SD_RECEIVE;
+        case Shutdown::send: return SD_SEND;
+        case Shutdown::both: return SD_BOTH;
+#else
+        case Shutdown::receive: return SHUT_RD;
+        case Shutdown::send: return SHUT_WR;
+        case Shutdown::both: return SHUT_RDWR;
+#endif
+    }
+    std::abort();
+}
+
 } // namespace
 
 std::ostream &operator<<(std::ostream &os, IpAddrV4 ip) {
@@ -125,8 +141,17 @@ IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
 
 Socket::Socket(Domain d, Type t, Protocol p) :
         socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
-
 Socket::Socket(int socket) : socket_{socket} {}
+Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, INVALID_SOCKET)} {}
+Socket &Socket::operator=(Socket &&o) noexcept {
+    socket_ = std::exchange(o.socket_, INVALID_SOCKET);
+    return *this;
+}
+
+Socket::~Socket() {
+    shutdown(Shutdown::both);
+    close();
+}
 
 bool Socket::connect(const SocketAddr addr) {
     const auto [a, size] = into_os(addr);
@@ -146,6 +171,18 @@ Socket Socket::accept() {
     auto socket{::accept(socket_, nullptr, nullptr)};
     assert(socket != INVALID_SOCKET);
     return Socket{static_cast<int>(socket)};
+}
+
+int Socket::shutdown(Shutdown what) {
+    return ::shutdown(socket_, into_os(what));
+}
+
+int Socket::close() {
+#ifdef _WIN32
+    return ::closesocket(std::exchange(socket_, INVALID_SOCKET));
+#else
+    return ::close(std::exchange(socket_, INVALID_SOCKET));
+#endif
 }
 
 int Socket::recv(std::byte *buf, int len) {

@@ -6,6 +6,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/test_ip_addr_v4.cpp
     src/test_ip_addr_v6.cpp
+    src/test_socket.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

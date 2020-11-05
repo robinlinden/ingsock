@@ -85,15 +85,32 @@ enum class Protocol {
     udp,
 };
 
+enum class Shutdown {
+    receive,
+    send,
+    both,
+};
+
 class Socket {
 public:
     Socket(Domain d, Type t, Protocol p);
     explicit Socket(int socket);
 
+    Socket(const Socket &) = delete;
+    Socket &operator=(const Socket &) = delete;
+
+    Socket(Socket &&) noexcept;
+    Socket &operator=(Socket &&) noexcept;
+
+    ~Socket();
+
     bool connect(SocketAddr addr);
     bool bind(SocketAddr addr);
     bool listen(int backlog);
     Socket accept();
+
+    int shutdown(Shutdown what);
+    int close();
 
     int recv(std::byte *buf, int len);
     int send(const std::byte *buf, int len);
