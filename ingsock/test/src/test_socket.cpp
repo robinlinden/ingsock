@@ -17,3 +17,13 @@ TEST_CASE("Socket::operator=(Socket &&)") {
     REQUIRE(s1.close() == -1); // NOLINT(bugprone-use-after-move)
     REQUIRE(s2.close() == 0);
 }
+
+TEST_CASE("resolve") {
+    const auto ips = resolve("localhost");
+    REQUIRE(!ips.empty());
+    if (std::holds_alternative<IpAddrV4>(ips.at(0))) {
+        REQUIRE(std::get<IpAddrV4>(ips.at(0)).ip == IpAddrV4::localhost().ip);
+    } else {
+        REQUIRE(std::get<IpAddrV6>(ips.at(0)).ip == IpAddrV6::localhost().ip);
+    }
+}
