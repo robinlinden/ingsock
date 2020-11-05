@@ -37,7 +37,7 @@ struct WinsockInitializer {
 [[maybe_unused]] WinsockInitializer ws = WinsockInitializer();
 #endif
 
-constexpr int into_os(Domain d) {
+constexpr int into_os(Domain d) noexcept {
     switch (d) {
         case Domain::ipv4:
             return AF_INET;
@@ -47,7 +47,7 @@ constexpr int into_os(Domain d) {
     std::abort();
 }
 
-constexpr int into_os(Type t) {
+constexpr int into_os(Type t) noexcept {
     switch (t) {
         case Type::stream:
             return SOCK_STREAM;
@@ -57,7 +57,7 @@ constexpr int into_os(Type t) {
     std::abort();
 }
 
-constexpr int into_os(Protocol p) {
+constexpr int into_os(Protocol p) noexcept {
     switch (p) {
         case Protocol::tcp:
             return IPPROTO_TCP;
@@ -67,7 +67,7 @@ constexpr int into_os(Protocol p) {
     std::abort();
 }
 
-std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
+std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) noexcept {
     struct sockaddr_storage s = {0};
     if (addr.is_ipv4) {
         auto *a = reinterpret_cast<sockaddr_in *>(&s);
@@ -84,7 +84,7 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) {
     }
 }
 
-constexpr int into_os(Shutdown s) {
+constexpr int into_os(Shutdown s) noexcept {
     switch (s) {
 #ifdef _WIN32
         case Shutdown::receive: return SD_RECEIVE;
@@ -139,45 +139,45 @@ IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
     return ip;
 }
 
-Socket::Socket(Domain d, Type t, Protocol p) :
+Socket::Socket(Domain d, Type t, Protocol p) noexcept :
         socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
-Socket::Socket(int socket) : socket_{socket} {}
+Socket::Socket(int socket) noexcept : socket_{socket} {}
 Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, INVALID_SOCKET)} {}
 Socket &Socket::operator=(Socket &&o) noexcept {
     socket_ = std::exchange(o.socket_, INVALID_SOCKET);
     return *this;
 }
 
-Socket::~Socket() {
+Socket::~Socket() noexcept {
     shutdown(Shutdown::both);
     close();
 }
 
-bool Socket::connect(const SocketAddr addr) {
+bool Socket::connect(const SocketAddr addr) noexcept {
     const auto [a, size] = into_os(addr);
     return ::connect(socket_, reinterpret_cast<const struct sockaddr *>(&a), size) == 0;
 }
 
-bool Socket::bind(const SocketAddr addr) {
+bool Socket::bind(const SocketAddr addr) noexcept {
     const auto [a, size] = into_os(addr);
     return ::bind(socket_, reinterpret_cast<const struct sockaddr *>(&a), size) == 0;
 }
 
-bool Socket::listen(const int backlog) {
+bool Socket::listen(const int backlog) noexcept {
     return ::listen(socket_, backlog) == 0;
 }
 
-Socket Socket::accept() {
+Socket Socket::accept() noexcept {
     auto socket{::accept(socket_, nullptr, nullptr)};
     assert(socket != INVALID_SOCKET);
     return Socket{static_cast<int>(socket)};
 }
 
-int Socket::shutdown(Shutdown what) {
+int Socket::shutdown(Shutdown what) noexcept {
     return ::shutdown(socket_, into_os(what));
 }
 
-int Socket::close() {
+int Socket::close() noexcept {
 #ifdef _WIN32
     return ::closesocket(std::exchange(socket_, INVALID_SOCKET));
 #else
@@ -185,15 +185,15 @@ int Socket::close() {
 #endif
 }
 
-int Socket::recv(std::byte *buf, int len) {
+int Socket::recv(std::byte *buf, int len) noexcept {
     return ::recv(socket_, reinterpret_cast<char *>(buf), len, 0);
 }
 
-int Socket::send(const std::byte *buf, int len) {
+int Socket::send(const std::byte *buf, int len) noexcept {
     return ::send(socket_, reinterpret_cast<const char *>(buf), len, 0);
 }
 
-int last_error() {
+int last_error() noexcept {
 #ifdef _WIN32
     return WSAGetLastError();
 #else

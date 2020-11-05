@@ -93,8 +93,8 @@ enum class Shutdown {
 
 class Socket {
 public:
-    Socket(Domain d, Type t, Protocol p);
-    explicit Socket(int socket);
+    Socket(Domain d, Type t, Protocol p) noexcept;
+    explicit Socket(int socket) noexcept;
 
     Socket(const Socket &) = delete;
     Socket &operator=(const Socket &) = delete;
@@ -102,26 +102,26 @@ public:
     Socket(Socket &&) noexcept;
     Socket &operator=(Socket &&) noexcept;
 
-    ~Socket();
+    ~Socket() noexcept;
 
-    bool connect(SocketAddr addr);
-    bool bind(SocketAddr addr);
-    bool listen(int backlog);
-    Socket accept();
+    bool connect(SocketAddr addr) noexcept;
+    bool bind(SocketAddr addr) noexcept;
+    bool listen(int backlog) noexcept;
+    Socket accept() noexcept;
 
-    int shutdown(Shutdown what);
-    int close();
+    int shutdown(Shutdown what) noexcept;
+    int close() noexcept;
 
-    int recv(std::byte *buf, int len);
-    int send(const std::byte *buf, int len);
+    int recv(std::byte *buf, int len) noexcept;
+    int send(const std::byte *buf, int len) noexcept;
 
     template<class T>
-    int recv(T *buf) {
+    int recv(T *buf) noexcept(noexcept(buf->data() && buf->size())) {
         return recv(reinterpret_cast<std::byte *>(buf->data()), buf->size());
     }
 
     template<class T>
-    int send(const T &buf) {
+    int send(const T &buf) noexcept(noexcept(buf.data() && buf.size())) {
         return send(reinterpret_cast<const std::byte *>(buf.data()), buf.size());
     }
 
@@ -132,7 +132,7 @@ private:
     int socket_;
 };
 
-int last_error();
+int last_error() noexcept;
 std::vector<IpAddr> resolve(const char *name);
 
 }
