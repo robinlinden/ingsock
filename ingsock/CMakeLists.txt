@@ -17,7 +17,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC
-        cxx_std_17
+        cxx_std_20
 )
 
 add_subdirectory(example)

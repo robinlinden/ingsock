@@ -1,6 +1,6 @@
 #include "ingsock.h"
 
-#include <cstddef>
+#include <array>
 #include <iostream>
 
 using namespace ingsock;
@@ -21,8 +21,8 @@ int main(int, char **) {
     }
 
     Socket client{s.accept()};
-    const std::string msg{"hello client"};
-    if (client.send(reinterpret_cast<const std::byte *>(msg.data()), msg.size()) != static_cast<int>(msg.size())) {
+    const auto msg{std::to_array("hello client")};
+    if (client.send(msg) != static_cast<int>(msg.size())) {
         const int err = last_error();
         std::cerr << "Failed to send message: " << err << std::endl;
     }

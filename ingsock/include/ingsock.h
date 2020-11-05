@@ -98,6 +98,16 @@ public:
     int recv(std::byte *buf, int len);
     int send(const std::byte *buf, int len);
 
+    template<class T>
+    int recv(T *buf) {
+        return recv(reinterpret_cast<std::byte *>(buf->data()), buf->size());
+    }
+
+    template<class T>
+    int send(const T &buf) {
+        return send(reinterpret_cast<const std::byte *>(buf.data()), buf.size());
+    }
+
 private:
     // Technically sockets are 64-bit on Windows x64, but
     // things like OpenSSL receive it as an int in their
