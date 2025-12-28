@@ -3,7 +3,6 @@ include(Catch)
 project(test_ingsock)
 
 add_executable(${PROJECT_NAME}
-    src/main.cpp
     src/test_ip_addr_v4.cpp
     src/test_ip_addr_v6.cpp
     src/test_socket.cpp
@@ -11,7 +10,7 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        Catch2::Catch2
+        Catch2::Catch2WithMain
         ingsock
 )
 
