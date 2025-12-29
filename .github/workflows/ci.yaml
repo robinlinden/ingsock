@@ -1,0 +1,56 @@
+name: ci
+on: [pull_request, workflow_dispatch]
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  contents: read
+
+jobs:
+  prettier:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --global prettier@3.7.4
+      - run: npx prettier --write .
+      - run: git diff --exit-code
+
+  cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-gcc-14
+            os: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
+            ancient-cmake: true
+          - name: linux-clang-18
+            os: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+          - name: windows-2025
+            os: windows-2025
+
+    defaults:
+      run:
+        shell: bash
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      # Oldest supported CMake version.
+      - run: pipx install cmake==3.20.2 && cmake --version
+        if: ${{ matrix.ancient-cmake }}
+      - run: pipx install cmake==4.2.1 && cmake --version
+        if: ${{ ! matrix.ancient-cmake }}
+      - run: echo "CC=${{ matrix.cc }}" >>$GITHUB_ENV && echo "CXX=${{ matrix.cxx }}" >>$GITHUB_ENV
+        if: ${{ matrix.cc != '' }}
+
+      - run: cmake -Wdev -Werror=dev -S . -B build
+      - run: cmake --build build --parallel 4
+
+      - run: ctest --output-on-failure --parallel 4 --test-dir build
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
+      - run: ctest --output-on-failure --parallel 4 --test-dir build -C Debug
+        if: ${{ startsWith(matrix.os, 'windows') }}
