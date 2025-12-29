@@ -142,9 +142,9 @@ IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
 Socket::Socket(Domain d, Type t, Protocol p) noexcept :
         socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
 Socket::Socket(int socket) noexcept : socket_{socket} {}
-Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, INVALID_SOCKET)} {}
+Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET))} {}
 Socket &Socket::operator=(Socket &&o) noexcept {
-    socket_ = std::exchange(o.socket_, INVALID_SOCKET);
+    socket_ = std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET));
     return *this;
 }
 
@@ -179,7 +179,7 @@ int Socket::shutdown(Shutdown what) noexcept {
 
 int Socket::close() noexcept {
 #ifdef _WIN32
-    return ::closesocket(std::exchange(socket_, INVALID_SOCKET));
+    return ::closesocket(std::exchange(socket_, static_cast<int>(INVALID_SOCKET)));
 #else
     return ::close(std::exchange(socket_, INVALID_SOCKET));
 #endif
