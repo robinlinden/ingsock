@@ -1,5 +1,5 @@
-#ifndef INGSOCK_H
-#define INGSOCK_H
+#ifndef ING_SOCKET_H_
+#define ING_SOCKET_H_
 
 #include <array>
 #include <cstddef>
