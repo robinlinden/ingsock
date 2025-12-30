@@ -22,7 +22,7 @@
 
 // TODO(robinlinden): Error handling.
 
-namespace ingsock {
+namespace ing {
 namespace {
 #ifdef _WIN32
 struct WinsockInitializer {
@@ -212,4 +212,4 @@ std::vector<IpAddr> resolve(const char *name) {
     return resolved;
 }
 
-} // namespace ingsock
+} // namespace ing

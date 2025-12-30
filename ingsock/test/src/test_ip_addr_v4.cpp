@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-using namespace ingsock;
+using namespace ing;
 
 TEST_CASE("IpAddrV4::parse") {
     using namespace std::literals;

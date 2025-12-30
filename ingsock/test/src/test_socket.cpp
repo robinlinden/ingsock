@@ -2,7 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using namespace ingsock;
+using namespace ing;
 
 TEST_CASE("Socket::Socket(&&)") {
     Socket s1{Domain::ipv4, Type::udp};

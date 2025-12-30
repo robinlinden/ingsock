@@ -10,7 +10,7 @@
 #include <variant>
 #include <vector>
 
-namespace ingsock {
+namespace ing {
 
 // IpAddr
 struct IpAddrV4 {
@@ -130,6 +130,6 @@ private:
 int last_error() noexcept;
 std::vector<IpAddr> resolve(const char *name);
 
-}
+} // namespace ing
 
 #endif

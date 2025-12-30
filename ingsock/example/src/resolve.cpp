@@ -3,7 +3,7 @@
 #include <iostream>
 #include <variant>
 
-using namespace ingsock;
+using namespace ing;
 
 int main(int argc, char **argv) {
     if (argc != 2) {

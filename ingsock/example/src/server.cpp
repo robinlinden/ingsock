@@ -3,7 +3,7 @@
 #include <array>
 #include <iostream>
 
-using namespace ingsock;
+using namespace ing;
 
 int main(int, char **) {
     Socket s{Domain::ipv4, Type::tcp};
