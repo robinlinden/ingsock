@@ -49,20 +49,10 @@ constexpr int into_os(Domain d) noexcept {
 
 constexpr int into_os(Type t) noexcept {
     switch (t) {
-        case Type::stream:
+        case Type::tcp:
             return SOCK_STREAM;
-        case Type::dgram:
+        case Type::udp:
             return SOCK_DGRAM;
-    }
-    std::abort();
-}
-
-constexpr int into_os(Protocol p) noexcept {
-    switch (p) {
-        case Protocol::tcp:
-            return IPPROTO_TCP;
-        case Protocol::udp:
-            return IPPROTO_UDP;
     }
     std::abort();
 }
@@ -139,8 +129,8 @@ IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
     return ip;
 }
 
-Socket::Socket(Domain d, Type t, Protocol p) noexcept :
-        socket_{static_cast<int>(::socket(into_os(d), into_os(t), into_os(p)))} {}
+Socket::Socket(Domain d, Type t) noexcept :
+        socket_{static_cast<int>(::socket(into_os(d), into_os(t), 0))} {}
 Socket::Socket(int socket) noexcept : socket_{socket} {}
 Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET))} {}
 Socket &Socket::operator=(Socket &&o) noexcept {

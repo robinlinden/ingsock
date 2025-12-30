@@ -76,11 +76,6 @@ enum class Domain {
 };
 
 enum class Type {
-    stream,
-    dgram,
-};
-
-enum class Protocol {
     tcp,
     udp,
 };
@@ -93,7 +88,7 @@ enum class Shutdown {
 
 class Socket {
 public:
-    Socket(Domain d, Type t, Protocol p) noexcept;
+    Socket(Domain d, Type t) noexcept;
     explicit Socket(int socket) noexcept;
 
     Socket(const Socket &) = delete;

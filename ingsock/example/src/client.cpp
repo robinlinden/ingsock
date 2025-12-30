@@ -7,7 +7,7 @@
 using namespace ingsock;
 
 int main(int, char **) {
-    Socket s{Domain::ipv4, Type::stream, Protocol::tcp};
+    Socket s{Domain::ipv4, Type::tcp};
 
     if (!s.connect(SocketAddrV4{IpAddrV4::localhost(), 22222})) {
         const int err{last_error()};
