@@ -33,9 +33,10 @@ target_compile_options(ingsock_warning INTERFACE
 
 # Library
 
-add_library(${PROJECT_NAME}
-    ing/ingsock.cpp
-)
+file(GLOB_RECURSE INGSOCK_SRCS CONFIGURE_DEPENDS "ing/*.cpp")
+list(FILTER INGSOCK_SRCS EXCLUDE REGEX "ing/.*_test.cpp")
+
+add_library(${PROJECT_NAME} ${INGSOCK_SRCS})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -57,11 +58,9 @@ target_compile_features(${PROJECT_NAME}
 
 include(Catch)
 
-add_executable(ingsock_test
-    ing/ip_addr_v4_test.cpp
-    ing/ip_addr_v6_test.cpp
-    ing/socket_test.cpp
-)
+file(GLOB_RECURSE INGSOCK_TEST_SRCS CONFIGURE_DEPENDS "ing/*_test.cpp")
+
+add_executable(ingsock_test ${INGSOCK_TEST_SRCS})
 
 target_link_libraries(ingsock_test
     PRIVATE
