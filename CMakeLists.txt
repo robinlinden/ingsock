@@ -66,6 +66,7 @@ target_link_libraries(ingsock_test
     PRIVATE
         Catch2::Catch2WithMain
         ingsock
+        ingsock::warning
 )
 
 catch_discover_tests(ingsock_test)
