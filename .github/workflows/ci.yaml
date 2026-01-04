@@ -14,6 +14,13 @@ jobs:
       - run: npx prettier --write .
       - run: git diff --exit-code
 
+  buildifier:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: wget --output-document=buildifier https://github.com/bazelbuild/buildtools/releases/download/v8.2.1/buildifier-linux-amd64 && sudo chmod +x buildifier
+      - run: ./buildifier -lint warn -warnings all -mode diff $(find . -type f -iname "*.bazel")
+
   cmake:
     strategy:
       fail-fast: false
@@ -35,7 +42,7 @@ jobs:
       run:
         shell: bash
 
-    name: ${{ matrix.name }}
+    name: cmake-${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -54,3 +61,33 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
       - run: ctest --output-on-failure --parallel 4 --test-dir build -C Debug
         if: ${{ startsWith(matrix.os, 'windows') }}
+
+  bazel:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-gcc-14
+            os: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
+            ancient-cmake: true
+          - name: linux-clang-18
+            os: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+          - name: windows-2025
+            os: windows-2025
+
+    defaults:
+      run:
+        shell: bash
+
+    name: bazel-${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: echo "CC=${{ matrix.cc }}" >>$GITHUB_ENV && echo "CXX=${{ matrix.cxx }}" >>$GITHUB_ENV
+        if: ${{ matrix.cc != '' }}
+
+      - run: bazel test ...
