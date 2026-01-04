@@ -1,0 +1,21 @@
+# Bazel configuration
+# =========================================================
+
+common --lockfile_mode=off
+
+build --enable_platform_specific_config
+test --test_output=errors
+test --test_summary=terse
+test --test_verbose_timeout_warnings
+
+# Compiler configuration
+# =========================================================
+
+build --features=layering_check
+
+build:linux --cxxopt=-std=c++20
+build:windows --cxxopt=-std:c++20
+build:windows --features=-default_cpp_std
+
+# Report the real supported C++ version, not just C++97.
+build:windows --cxxopt='/Zc:__cplusplus'

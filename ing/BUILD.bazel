@@ -1,0 +1,25 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "ing",
+    srcs = glob(
+        include = ["*.cpp"],
+        exclude = ["*_test.cpp"],
+    ),
+    hdrs = glob(["*.h"]),
+    linkopts = select({
+        "@platforms//os:windows": ["-DEFAULTLIB:Ws2_32"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "ing_test",
+    srcs = glob(["*_test.cpp"]),
+    deps = [
+        ":ing",
+        "@catch2",
+        "@catch2//:catch2_main",
+    ],
+)

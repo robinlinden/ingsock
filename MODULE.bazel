@@ -1,0 +1,5 @@
+module(name = "ingsock")
+
+bazel_dep(name = "catch2", version = "3.11.0")  # BSL-1.0
+bazel_dep(name = "platforms", version = "1.0.0")  # Apache-2.0
+bazel_dep(name = "rules_cc", version = "0.2.16")  # Apache-2.0
