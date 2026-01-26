@@ -10,13 +10,13 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
+#include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 #include <netinet/in.h>
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #define INVALID_SOCKET (-1)
 #endif
 
@@ -30,29 +30,27 @@ struct WinsockInitializer {
         WSADATA wsa_data;
         WSAStartup(MAKEWORD(2, 2), &wsa_data);
     }
-    ~WinsockInitializer() {
-        WSACleanup();
-    }
+    ~WinsockInitializer() { WSACleanup(); }
 };
 [[maybe_unused]] WinsockInitializer ws = WinsockInitializer();
 #endif
 
 constexpr int into_os(Domain d) noexcept {
     switch (d) {
-        case Domain::ipv4:
-            return AF_INET;
-        case Domain::ipv6:
-            return AF_INET6;
+    case Domain::ipv4:
+        return AF_INET;
+    case Domain::ipv6:
+        return AF_INET6;
     }
     std::abort();
 }
 
 constexpr int into_os(Type t) noexcept {
     switch (t) {
-        case Type::tcp:
-            return SOCK_STREAM;
-        case Type::udp:
-            return SOCK_DGRAM;
+    case Type::tcp:
+        return SOCK_STREAM;
+    case Type::udp:
+        return SOCK_DGRAM;
     }
     std::abort();
 }
@@ -77,13 +75,19 @@ std::pair<struct sockaddr_storage, std::size_t> into_os(SocketAddr addr) noexcep
 constexpr int into_os(Shutdown s) noexcept {
     switch (s) {
 #ifdef _WIN32
-        case Shutdown::receive: return SD_RECEIVE;
-        case Shutdown::send: return SD_SEND;
-        case Shutdown::both: return SD_BOTH;
+    case Shutdown::receive:
+        return SD_RECEIVE;
+    case Shutdown::send:
+        return SD_SEND;
+    case Shutdown::both:
+        return SD_BOTH;
 #else
-        case Shutdown::receive: return SHUT_RD;
-        case Shutdown::send: return SHUT_WR;
-        case Shutdown::both: return SHUT_RDWR;
+    case Shutdown::receive:
+        return SHUT_RD;
+    case Shutdown::send:
+        return SHUT_WR;
+    case Shutdown::both:
+        return SHUT_RDWR;
 #endif
     }
     std::abort();
@@ -129,10 +133,11 @@ IpAddrV6 IpAddrV6::parse(const std::string &ip_str) {
     return ip;
 }
 
-Socket::Socket(Domain d, Type t) noexcept :
-        socket_{static_cast<int>(::socket(into_os(d), into_os(t), 0))} {}
+Socket::Socket(Domain d, Type t) noexcept
+    : socket_{static_cast<int>(::socket(into_os(d), into_os(t), 0))} {}
 Socket::Socket(int socket) noexcept : socket_{socket} {}
-Socket::Socket(Socket &&o) noexcept : socket_{std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET))} {}
+Socket::Socket(Socket &&o) noexcept
+    : socket_{std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET))} {}
 Socket &Socket::operator=(Socket &&o) noexcept {
     socket_ = std::exchange(o.socket_, static_cast<int>(INVALID_SOCKET));
     return *this;
@@ -153,9 +158,7 @@ bool Socket::bind(const SocketAddr addr) noexcept {
     return ::bind(socket_, reinterpret_cast<const struct sockaddr *>(&a), size) == 0;
 }
 
-bool Socket::listen(const int backlog) noexcept {
-    return ::listen(socket_, backlog) == 0;
-}
+bool Socket::listen(const int backlog) noexcept { return ::listen(socket_, backlog) == 0; }
 
 Socket Socket::accept() noexcept {
     auto socket{::accept(socket_, nullptr, nullptr)};
@@ -163,9 +166,7 @@ Socket Socket::accept() noexcept {
     return Socket{static_cast<int>(socket)};
 }
 
-int Socket::shutdown(Shutdown what) noexcept {
-    return ::shutdown(socket_, into_os(what));
-}
+int Socket::shutdown(Shutdown what) noexcept { return ::shutdown(socket_, into_os(what)); }
 
 int Socket::close() noexcept {
 #ifdef _WIN32

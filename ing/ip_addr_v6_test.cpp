@@ -2,8 +2,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace ing;
 
@@ -19,9 +19,7 @@ TEST_CASE("IpAddrV6::localhost") {
     REQUIRE(IpAddrV6::localhost().ip == localhost);
 }
 
-TEST_CASE("IpAddrV6::any") {
-    REQUIRE(IpAddrV6::any().ip == std::array<std::byte, 16>{});
-}
+TEST_CASE("IpAddrV6::any") { REQUIRE(IpAddrV6::any().ip == std::array<std::byte, 16>{}); }
 
 TEST_CASE("IpAddrV6::ostream") {
     using namespace std::literals;

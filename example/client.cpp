@@ -17,7 +17,7 @@ int main(int, char **) {
 
     std::array<std::byte, 1024> recv_buf{};
     while (s.recv(&recv_buf) > 0) {
-        std::cout << reinterpret_cast<const char*>(recv_buf.data()) << std::endl;
+        std::cout << reinterpret_cast<const char *>(recv_buf.data()) << std::endl;
         recv_buf.fill(static_cast<std::byte>(0));
     }
 

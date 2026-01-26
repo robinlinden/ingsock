@@ -16,8 +16,8 @@ namespace ing {
 struct IpAddrV4 {
     static IpAddrV4 parse(const std::string &ip);
 
-    constexpr IpAddrV4(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d) :
-            ip{static_cast<uint32_t>(a | b << 8 | c << 16 | d << 24)} {}
+    constexpr IpAddrV4(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d)
+        : ip{static_cast<uint32_t>(a | b << 8 | c << 16 | d << 24)} {}
     explicit constexpr IpAddrV4(std::uint32_t ip_) : ip{ip_} {}
     std::uint32_t ip;
 
@@ -39,9 +39,7 @@ struct IpAddrV6 {
         return IpAddrV6{ip};
     }
 
-    static constexpr IpAddrV6 any() {
-        return IpAddrV6{std::array<std::byte, 16>{}};
-    }
+    static constexpr IpAddrV6 any() { return IpAddrV6{std::array<std::byte, 16>{}}; }
 };
 std::ostream &operator<<(std::ostream &os, IpAddrV6 ip);
 
@@ -87,7 +85,7 @@ enum class Shutdown {
 };
 
 class Socket {
-public:
+  public:
     Socket(Domain d, Type t) noexcept;
     explicit Socket(int socket) noexcept;
 
@@ -110,17 +108,15 @@ public:
     int recv(std::byte *buf, int len) noexcept;
     int send(const std::byte *buf, int len) noexcept;
 
-    template<class T>
-    int recv(T *buf) noexcept(noexcept(buf->data() && buf->size())) {
+    template <class T> int recv(T *buf) noexcept(noexcept(buf->data() && buf->size())) {
         return recv(reinterpret_cast<std::byte *>(buf->data()), buf->size());
     }
 
-    template<class T>
-    int send(const T &buf) noexcept(noexcept(buf.data() && buf.size())) {
+    template <class T> int send(const T &buf) noexcept(noexcept(buf.data() && buf.size())) {
         return send(reinterpret_cast<const std::byte *>(buf.data()), buf.size());
     }
 
-private:
+  private:
     // Technically sockets are 64-bit on Windows x64, but
     // things like OpenSSL receive it as an int in their
     // API, so this is unlikely to ever break.
